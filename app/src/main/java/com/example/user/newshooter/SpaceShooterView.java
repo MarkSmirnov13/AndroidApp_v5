@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
@@ -21,11 +22,16 @@ import java.util.ArrayList;
 import java.util.Random;
 import android.media.SoundPool;
 import android.media.SoundPool.OnLoadCompleteListener;
+import android.webkit.WebHistoryItem;
+import android.widget.ImageView;
+
 /**
  * Created by user on 6/8/2016.
  */
 public class SpaceShooterView extends SurfaceView implements Runnable{
 
+   // ImageView image;
+   // AnimationDrawable mAnim;
     Context context;
     final Random random = new Random();
     // This is our thread
@@ -179,7 +185,6 @@ public class SpaceShooterView extends SurfaceView implements Runnable{
     private int s = 1;
     @Override
     public void run() {
-        //if (x > 0) {
         mPlayer = MediaPlayer.create(context, R.raw.bit);
         mPlayer.start();
         while (playing) {
@@ -199,21 +204,42 @@ public class SpaceShooterView extends SurfaceView implements Runnable{
             }
         }
 
-        mPlayer.stop();
+        //mPlayer.stop();
     }
 
     private void update(){
 
         // Did an invader bump into the side of the screen
-        boolean bumped = false;
 
-        if (score >= 100){
-            if (score == 100) {
+
+        if (score >= 9 && score < 19){
+            if (score == 9) {
+                if (mPlayer == MediaPlayer.create(context, R.raw.bit)) {
+                    mPlayer.stop();
+                    mPlayer = MediaPlayer.create(context, R.raw.cool);
+                }
+
+            }
+            /*else {
+                if (!mPlayer.isPlaying()) {
+                    mPlayer = MediaPlayer.create(context, R.raw.cool);
+                }
+            }*/
+            mPlayer.start();
+        }
+
+        if (score >= 19){
+            if (score == 19){
                 mPlayer.stop();
-                mPlayer = MediaPlayer.create(context, R.raw.cool);
+            }
+            else{
+                if (!mPlayer.isPlaying()) {
+                    mPlayer = MediaPlayer.create(context, R.raw.dpstp);
+                }
             }
             mPlayer.start();
         }
+        boolean bumped = false;
         // Has the player lost
         boolean lost = false;
 
@@ -280,7 +306,7 @@ public class SpaceShooterView extends SurfaceView implements Runnable{
         // Has the player's bullet hit the top of the screen
 
         // Has an invaders bullet hit the bottom of the screen
-
+        //image = (ImageView)findViewById(R.id.imageView1);
         // Has the player's bullet hit an invader
         for(Bullet b : bullets) {
             if (b.getStatus()) {
@@ -289,7 +315,12 @@ public class SpaceShooterView extends SurfaceView implements Runnable{
                         if (e.getStatus()) {
                             if (e.isVisible()) {
                                 if (RectF.intersects(b.getRect(), e.getRect())) {
-                                    soundPool.play(soundID2, 1, 1, 0, 0, 1);
+                                    soundPool.play(soundID2, 1, 1, 0, 0, 2);
+
+                                    //image.setBackgroundResource(R.drawable.animation_list);
+
+                                    //mAnim = (AnimationDrawable)image.getBackground();
+                                    //mAnim.start();
                                     e.setVisible(false);
                                     b.setVisible(false);
                                     score = score + 1;
@@ -315,17 +346,20 @@ public class SpaceShooterView extends SurfaceView implements Runnable{
             canvas.drawColor(Color.BLACK);
             canvas.drawBitmap(pauseButton.getBitmap(), pauseButton.getX(), pauseButton.getY(), paint);
             // Choose the brush color for drawing
-            if(score <= 100) {
-                //mPlayer = MediaPlayer.create(context, R.raw.bit);
+            if(score <= 49) {
                 paint.setColor(Color.WHITE);
                 for (int i = 0; i < 50; i++)
                     canvas.drawCircle(random.nextInt(screenX), random.nextInt(screenY), 1, paint);
             }
-            else if (score > 100){
-                //mPlayer = MediaPlayer.create(context, R.raw.cool);
+            else if (score > 49 && score <=99){
                 paint.setColor(Color.argb(random.nextInt(255), random.nextInt(255), random.nextInt(255), 255));
                 for (int i = 0; i < 50; i++)
                     canvas.drawCircle(random.nextInt(screenX), random.nextInt(screenY), 7, paint);
+            }
+            else if (score > 99){
+                paint.setColor(Color.argb(random.nextInt(255), random.nextInt(255), random.nextInt(255), 255));
+                for (int i = 0; i < 50; i++)
+                    canvas.drawRect(0, 0 ,screenX, screenY, paint);
             }
             paint.setColor(Color.argb(255, 255, 255, 255));
 
@@ -350,7 +384,7 @@ public class SpaceShooterView extends SurfaceView implements Runnable{
                 if (bull.getStatus() && bull.isVisible()) {
                     //canvas.drawRect(bull.getRect(), paint);
                     canvas.drawBitmap(bull.getBitmap(), null, bull.getRect(), paint);
-                    soundPool.play(soundID1, 0.1f,0.1f,0,0,1);
+                    //soundPool.play(soundID1, 0.1f,0.1f,0,0,2);
                 }
             }
             // Draw the invaders bullets if active
